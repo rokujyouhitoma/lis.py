@@ -7,11 +7,6 @@
 
 from __future__ import division
 
-from rpython.rlib.rstring import replace, rsplit
-from rpython.rlib.rstring import ParseStringError
-from rpython.rlib.rbigint import rbigint
-
-
 Symbol = str          # A Lisp Symbol is implemented as a Python str
 List   = list         # A Lisp List is implemented as a Python list
 Number = (int, float) # A Lisp Number is implemented as a Python int or float
@@ -24,7 +19,7 @@ def parse(program):
 
 def tokenize(s):
     "Convert a string into a list of tokens."
-    return rsplit(replace(replace(s, '(', ' ( '), ')', ' ) '))
+    return s.replace('(',' ( ').replace(')',' ) ').split()
 
 def read_from_tokens(tokens):
     "Read an expression from a sequence of tokens."
@@ -44,11 +39,9 @@ def read_from_tokens(tokens):
 
 def atom(token):
     "Numbers become numbers; every other token is a symbol."
-    try:
-        return rbigint.fromstr(token).toint()
-    except ParseStringError:
-        try:
-            return float(token)
+    try: return int(token)
+    except ValueError:
+        try: return float(token)
         except ValueError:
             return Symbol(token)
 
